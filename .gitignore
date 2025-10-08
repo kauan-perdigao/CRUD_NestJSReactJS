@@ -26,4 +26,4 @@ coverage/
 *.tsbuildinfo
 
 # Ignore app module (as requested)
-src/app.module.ts
+src/app.module.tsback_nest/.git.backup*/
