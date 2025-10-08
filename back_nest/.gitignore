@@ -1,0 +1,29 @@
+# Node.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.*
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Build output
+build/
+coverage/
+
+# NestJS
+*.tsbuildinfo
+
+# Ignore app module (as requested)
+src/app.module.ts
