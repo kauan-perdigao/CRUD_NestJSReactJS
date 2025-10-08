@@ -10,21 +10,18 @@ yarn-error.log*
 
 # VSCode
 .vscode/
-
 # OS files
 .DS_Store
 Thumbs.db
-
 # Logs
 logs/
 *.log
-
 # Build output
 build/
 coverage/
-
 # NestJS
 *.tsbuildinfo
-
 # Ignore app module (as requested)
 src/app.module.tsback_nest/.git.backup*/
+back_nest/src/app.module.ts
+back_nest/node_modules/@nestjs/schematics/dist/lib/application/files/ts/src/app.module.ts
