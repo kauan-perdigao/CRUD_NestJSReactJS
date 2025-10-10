@@ -27,10 +27,10 @@ export class ProdutosController {
     return this.produtosService.update(+id, updateProdutoDto);
   }
 
-  @Patch(':id')
+  /*@Patch(':id')
   partialUpdate(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
     return this.produtosService.update(+id, updateProdutoDto);
-  }
+  }*/
 
   @Delete(':id')
   remove(@Param('id') id: string) {
