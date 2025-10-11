@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { Produto } from './entities/produto.entity';
+import { PaginatedResponse, ProdutoFilters } from './interfaces/pagination.interface';
 
 @Injectable()
 export class ProdutosService {
@@ -17,12 +18,46 @@ export class ProdutosService {
     return this.repo.save(produto);
   }
 
-  findAll() {
-    return this.repo.find();
+  async findAll(filters: ProdutoFilters = {}): Promise<PaginatedResponse<Produto>> {
+    const { search, categoriaId, page = 1, limit = 10 } = filters;
+    
+    const queryBuilder = this.repo.createQueryBuilder('produto')
+      .leftJoinAndSelect('produto.categoria', 'categoria');
+
+    // Filtro de busca por nome
+    if (search) {
+      queryBuilder.where('produto.nome ILIKE :search', { search: `%${search}%` });
+    }
+
+    // Filtro por categoria
+    if (categoriaId) {
+      queryBuilder.andWhere('produto.categoriaId = :categoriaId', { categoriaId });
+    }
+
+    // Paginação
+    const skip = (page - 1) * limit;
+    queryBuilder.skip(skip).take(limit);
+
+    // Ordenação
+    queryBuilder.orderBy('produto.id', 'DESC');
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages,
+    };
   }
 
   async findOne(id: number) {
-    const produto = await this.repo.findOneBy({ id });
+    const produto = await this.repo.findOne({
+      where: { id },
+      relations: ['categoria'],
+    });
     if (!produto) throw new NotFoundException(`Produto ${id} not found`);
     return produto;
   }

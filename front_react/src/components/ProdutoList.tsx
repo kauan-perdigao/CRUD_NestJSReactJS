@@ -35,8 +35,8 @@ const ProdutoList: React.FC<ProdutoListProps> = ({
     return (
       <div className="empty-state">
         <Package size={64} />
-        <h3>Nenhum produto encontrado</h3>
-        <p>Comece criando seu primeiro produto!</p>
+        <h3>Nenhum produto cadastrado.</h3>
+        <p>Use o botão "Novo Produto" acima para criar seu primeiro produto.</p>
       </div>
     );
   }
@@ -71,6 +71,15 @@ const ProdutoList: React.FC<ProdutoListProps> = ({
             )}
 
             <div className="product-details">
+              <div className="product-category">
+                <span className="category-label">Categoria:</span>
+                {produto.categoria ? (
+                  <span className="category-value">{produto.categoria.nome}</span>
+                ) : (
+                  <span className="category-value-null">Sem categoria</span>
+                )}
+              </div>
+              
               <div className="product-price">
                 <span className="price-label">Preço:</span>
                 <span className="price-value">{formatPrice(produto.preco)}</span>

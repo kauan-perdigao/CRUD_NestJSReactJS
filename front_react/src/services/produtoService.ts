@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto } from '../types/produto';
+import type { Produto, CreateProdutoDto, UpdateProdutoDto, PaginatedResponse, ProdutoFilters } from '../types/produto';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -11,9 +11,16 @@ const api = axios.create({
 });
 
 export const produtoService = {
-  // Listar todos os produtos
-  async getAllProdutos(): Promise<Produto[]> {
-    const response = await api.get('/produtos');
+  // Listar todos os produtos com filtros e paginação
+  async getAllProdutos(filters: ProdutoFilters = {}): Promise<PaginatedResponse<Produto>> {
+    const params = new URLSearchParams();
+    
+    if (filters.search) params.append('search', filters.search);
+    if (filters.categoriaId) params.append('categoriaId', filters.categoriaId.toString());
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.limit) params.append('limit', filters.limit.toString());
+
+    const response = await api.get(`/produtos?${params.toString()}`);
     return response.data;
   },
 

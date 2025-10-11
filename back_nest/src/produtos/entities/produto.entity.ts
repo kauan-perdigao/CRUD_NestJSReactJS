@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Categoria } from '../../categorias/entities/categoria.entity';
 
 @Entity({ name: 'produtos' })
 export class Produto {
@@ -16,4 +17,14 @@ export class Produto {
 
 	@Column({ type: 'int', default: 0 })
 	estoque: number;
+
+	@Column({ name: 'categoria_id', nullable: true })
+	categoriaId?: number;
+
+	@ManyToOne(() => Categoria, (categoria) => categoria.produtos, { 
+		onDelete: 'SET NULL',
+		nullable: true
+	})
+	@JoinColumn({ name: 'categoria_id' })
+	categoria?: Categoria;
 }

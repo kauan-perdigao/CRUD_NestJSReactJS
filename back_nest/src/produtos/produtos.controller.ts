@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@nestjs/common';
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
+import { ProdutoFilters } from './interfaces/pagination.interface';
 
 @Controller('produtos')
 export class ProdutosController {
@@ -13,8 +14,19 @@ export class ProdutosController {
   }
 
   @Get()
-  findAll() {
-    return this.produtosService.findAll();
+  findAll(
+    @Query('search') search?: string,
+    @Query('categoriaId') categoriaId?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const filters: ProdutoFilters = {
+      search,
+      categoriaId: categoriaId ? +categoriaId : undefined,
+      page: page ? +page : 1,
+      limit: limit ? +limit : 10,
+    };
+    return this.produtosService.findAll(filters);
   }
 
   @Get(':id')

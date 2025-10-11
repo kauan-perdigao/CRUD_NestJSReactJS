@@ -17,4 +17,8 @@ export class CreateProdutoDto {
 	@IsNumber()
 	@Min(0)
 	estoque?: number;
+
+	@IsNotEmpty()
+	@IsNumber()
+	categoriaId: number;
 }

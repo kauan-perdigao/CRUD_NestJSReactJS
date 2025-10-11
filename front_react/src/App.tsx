@@ -1,14 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Plus, Package } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Plus, Package, Tag } from 'lucide-react';
 import './App.css';
 import ProdutoList from './components/ProdutoList';
 import ProdutoForm from './components/ProdutoForm';
+import CategoriaList from './components/CategoriaList';
+import CategoriaForm from './components/CategoriaForm';
 import ConfirmDialog from './components/ConfirmDialog';
 import Toast from './components/Toast';
+import SearchBar from './components/SearchBar';
+import Pagination from './components/Pagination';
 import { produtoService } from './services/produtoService';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto } from './types/produto';
+import { categoriaService } from './services/categoriaService';
+import type { Produto, CreateProdutoDto, UpdateProdutoDto, ProdutoFilters } from './types/produto';
 
 function App() {
+  const [activeTab, setActiveTab] = useState<'produtos' | 'categorias'>('produtos');
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -18,10 +24,41 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showCategoriaForm, setShowCategoriaForm] = useState(false);
+  const [categoriaListKey, setCategoriaListKey] = useState(0);
+  
+  // Estados para paginação e filtros
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [filters, setFilters] = useState<ProdutoFilters>({
+    page: 1,
+    limit: 10,
+  });
+  
+  // Estado para busca de categorias
+  const [categoriaSearch, setCategoriaSearch] = useState('');
+
+  const loadProdutos = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await produtoService.getAllProdutos(filters);
+      setProdutos(response.data);
+      setTotalPages(response.totalPages);
+      setTotalItems(response.total);
+      setCurrentPage(response.page);
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err);
+      setError('Erro ao carregar produtos. Verifique se o backend está rodando.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filters]);
 
   useEffect(() => {
     loadProdutos();
-  }, []);
+  }, [loadProdutos]);
 
   useEffect(() => {
     if (toast) {
@@ -32,23 +69,13 @@ function App() {
     }
   }, [toast]);
 
-  const loadProdutos = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await produtoService.getAllProdutos();
-      setProdutos(data);
-    } catch (err) {
-      console.error('Erro ao carregar produtos:', err);
-      setError('Erro ao carregar produtos. Verifique se o backend está rodando.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleCreateProduto = () => {
     setEditingProduto(undefined);
     setIsFormOpen(true);
+  };
+
+  const handleCreateCategoria = () => {
+    setShowCategoriaForm(true);
   };
 
   const handleEditProduto = (produto: Produto) => {
@@ -117,6 +144,45 @@ function App() {
     setProdutoToDelete(null);
   };
 
+  // Handlers para filtros e paginação
+  const handleSearch = useCallback((search: string) => {
+    setFilters(prev => ({
+      ...prev,
+      search: search || undefined,
+      page: 1,
+    }));
+  }, []);
+
+
+
+  const handlePageChange = useCallback((page: number) => {
+    setFilters(prev => ({
+      ...prev,
+      page,
+    }));
+  }, []);
+
+  const handleCategoriaSearch = useCallback((search: string) => {
+    setCategoriaSearch(search);
+  }, []);
+
+  const handleSaveCategoria = async (categoriaData: { nome?: string; descricao?: string }) => {
+    try {
+      await categoriaService.createCategoria(categoriaData as { nome: string; descricao?: string });
+      setShowCategoriaForm(false);
+      setToast({ type: 'success', message: 'Categoria criada com sucesso!' });
+      
+      // Forçar atualização do CategoriaList
+      setCategoriaListKey(prev => prev + 1);
+      
+      // Recarregar produtos para atualizar filtros de categoria
+      loadProdutos();
+    } catch (error) {
+      console.error('Erro ao criar categoria:', error);
+      setToast({ type: 'error', message: 'Erro ao criar categoria' });
+    }
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -125,7 +191,7 @@ function App() {
           <h1 className="app-title">CRUD de Produtos Gerais</h1>
         </div>
         <p className="app-subtitle">
-          Gerencie seu catálogo de produtos de forma simples e eficiente.
+          Gerencie seu catálogo de produtos e categorias de forma simples e eficiente.
         </p>
         
         {error && (
@@ -153,23 +219,81 @@ function App() {
           </div>
         )}
 
-        <button 
-          onClick={handleCreateProduto}
-          className="btn btn-primary"
-          disabled={isLoading}
-        >
-          <Plus size={16} />
-          Novo Produto
-        </button>
+        {/* Navegação por abas */}
+        <div className="navigation-tabs">
+          <button
+            className={`nav-tab ${activeTab === 'produtos' ? 'active' : ''}`}
+            onClick={() => setActiveTab('produtos')}
+          >
+            <Package size={18} />
+            Produtos
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'categorias' ? 'active' : ''}`}
+            onClick={() => setActiveTab('categorias')}
+          >
+            <Tag size={18} />
+            Categorias
+          </button>
+        </div>
+
+        {/* Controles de cada aba - dentro do mesmo card */}
+        <div className="tab-controls">
+          {activeTab === 'produtos' ? (
+            <div className="filters-container">
+              <SearchBar onSearch={handleSearch} />
+              <button 
+                onClick={handleCreateProduto}
+                className="btn btn-primary"
+                disabled={isLoading}
+              >
+                <Plus size={16} />
+                Novo Produto
+              </button>
+            </div>
+          ) : (
+            <div className="filters-container">
+              <SearchBar 
+                onSearch={handleCategoriaSearch} 
+                placeholder="Buscar categorias..."
+              />
+              <button 
+                onClick={handleCreateCategoria}
+                className="btn btn-primary"
+              >
+                <Plus size={16} />
+                Nova Categoria
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main>
-        <ProdutoList
-          produtos={produtos}
-          onEdit={handleEditProduto}
-          onDelete={handleDeleteProduto}
-          isLoading={isLoading}
-        />
+        {activeTab === 'produtos' ? (
+          <>
+            <ProdutoList
+              produtos={produtos}
+              onEdit={handleEditProduto}
+              onDelete={handleDeleteProduto}
+              isLoading={isLoading}
+            />
+            
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              total={totalItems}
+              limit={filters.limit || 10}
+              onPageChange={handlePageChange}
+            />
+          </>
+        ) : (
+          <CategoriaList 
+            key={categoriaListKey}
+            searchTerm={categoriaSearch}
+            onCategoriaChange={loadProdutos}
+          />
+        )}
       </main>
 
       {isFormOpen && (
@@ -189,6 +313,14 @@ function App() {
         onCancel={handleCancelDelete}
         isLoading={isSubmitting}
       />
+
+      {showCategoriaForm && (
+        <CategoriaForm
+          onSave={handleSaveCategoria}
+          onCancel={() => setShowCategoriaForm(false)}
+          isLoading={isSubmitting}
+        />
+      )}
 
       {toast && (
         <Toast

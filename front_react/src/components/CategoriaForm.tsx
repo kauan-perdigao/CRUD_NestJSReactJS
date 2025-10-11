@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto, Categoria } from '../types/produto';
-import { categoriaService } from '../services/categoriaService';
+import type { Categoria } from '../types/produto';
 
-interface ProdutoFormProps {
-  produto?: Produto;
-  onSave: (produto: CreateProdutoDto | UpdateProdutoDto) => void;
+interface CreateCategoriaDto {
+  nome: string;
+  descricao?: string;
+}
+
+interface UpdateCategoriaDto {
+  nome?: string;
+  descricao?: string;
+}
+
+interface CategoriaFormProps {
+  categoria?: Categoria;
+  onSave: (categoria: CreateCategoriaDto | UpdateCategoriaDto) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-const ProdutoForm: React.FC<ProdutoFormProps> = ({
-  produto,
+const CategoriaForm: React.FC<CategoriaFormProps> = ({
+  categoria,
   onSave,
   onCancel,
   isLoading = false,
@@ -19,57 +28,38 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
   const [formData, setFormData] = useState({
     nome: '',
     descricao: '',
-    preco: 0,
-    categoriaId: 0,
   });
   const [formError, setFormError] = useState<string | null>(null);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   useEffect(() => {
-    loadCategorias();
-  }, []);
-
-  useEffect(() => {
-    if (produto) {
+    if (categoria) {
       setFormData({
-        nome: produto.nome,
-        descricao: produto.descricao || '',
-        preco: produto.preco,
-        categoriaId: produto.categoriaId || 0,
+        nome: categoria.nome,
+        descricao: categoria.descricao || '',
       });
     }
-  }, [produto]);
-
-  const loadCategorias = async () => {
-    try {
-      const data = await categoriaService.getAllCategorias();
-      setCategorias(data);
-    } catch (error) {
-      console.error('Erro ao carregar categorias:', error);
-    }
-  };
+  }, [categoria]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
     
-    if (!formData.categoriaId) {
-      setFormError('Por favor, selecione uma categoria.');
+    if (!formData.nome.trim()) {
+      setFormError('Por favor, informe o nome da categoria.');
       return;
     }
     
     onSave({
-      ...formData,
-      preco: Number(formData.preco),
-      categoriaId: formData.categoriaId,
+      nome: formData.nome.trim(),
+      descricao: formData.descricao.trim() || undefined,
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'categoriaId' ? (value ? Number(value) : 0) : value,
+      [name]: value,
     }));
   };
 
@@ -77,7 +67,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
     <div className="form-overlay">
       <div className="form-modal">
         <div className="form-header">
-          <h2>{produto ? 'Editar Produto' : 'Novo Produto'}</h2>
+          <h2>{categoria ? 'Editar Categoria' : 'Nova Categoria'}</h2>
           <button 
             type="button" 
             onClick={onCancel}
@@ -113,6 +103,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
               required
               disabled={isLoading}
               maxLength={200}
+              placeholder="Ex: Eletrônicos, Roupas, Casa..."
             />
           </div>
 
@@ -125,40 +116,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
               onChange={handleChange}
               rows={3}
               disabled={isLoading}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="categoriaId">Categoria *</label>
-            <select
-              id="categoriaId"
-              name="categoriaId"
-              value={formData.categoriaId || ''}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            >
-              <option value="">Selecione uma categoria</option>
-              {categorias.map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="preco">Preço (R$) *</label>
-            <input
-              type="number"
-              id="preco"
-              name="preco"
-              value={formData.preco}
-              onChange={handleChange}
-              required
-              min="0"
-              step="0.01"
-              disabled={isLoading}
+              placeholder="Descrição opcional da categoria..."
             />
           </div>
 
@@ -186,4 +144,4 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
   );
 };
 
-export default ProdutoForm;
+export default CategoriaForm;
