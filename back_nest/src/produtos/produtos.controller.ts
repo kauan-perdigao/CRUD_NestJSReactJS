@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
-import { ProdutoFilters } from './interfaces/pagination.interface';
+import { ProdutoFilters } from '../interfaces/pagination.interface';
 
 @Controller('produtos')
 export class ProdutosController {
@@ -38,11 +38,6 @@ export class ProdutosController {
   update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
     return this.produtosService.update(+id, updateProdutoDto);
   }
-
-  /*@Patch(':id')
-  partialUpdate(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
-    return this.produtosService.update(+id, updateProdutoDto);
-  }*/
 
   @Delete(':id')
   remove(@Param('id') id: string) {

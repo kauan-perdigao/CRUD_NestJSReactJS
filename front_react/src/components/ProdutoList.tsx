@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Trash2, Package } from 'lucide-react';
+import { Edit2, Trash2, Package } from 'lucide-react';
 import type { Produto } from '../types/produto';
 
 interface ProdutoListProps {
@@ -42,36 +42,42 @@ const ProdutoList: React.FC<ProdutoListProps> = ({
   }
 
   return (
-    <div className="product-grid">
-      {produtos.map((produto) => {
-        return (
-          <div key={produto.id} className="product-card">
-            <div className="product-header">
-              <h3 className="product-title">{produto.nome}</h3>
-              <div className="product-actions">
-                <button
-                  onClick={() => onEdit(produto)}
-                  className="btn-icon btn-edit"
-                  title="Editar produto"
-                >
-                  <Edit size={16} />
-                </button>
-                <button
-                  onClick={() => onDelete(produto.id)}
-                  className="btn-icon btn-delete"
-                  title="Excluir produto"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+    <div className="produto-grid">
+      {produtos.map((produto) => (
+        <div key={produto.id} className="produto-card">
+          <div className="produto-header">
+            <div className="produto-icon">
+              <Package size={20} />
             </div>
-
+            <div className="produto-actions">
+              <button
+                onClick={() => onEdit(produto)}
+                className="btn-icon btn-edit"
+                title="Editar produto"
+              >
+                <Edit2 size={16} />
+              </button>
+              <button
+                onClick={() => onDelete(produto.id)}
+                className="btn-icon btn-delete"
+                title="Excluir produto"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+          
+          <div className="produto-content">
+            <h3 className="produto-title">{produto.nome}</h3>
             {produto.descricao && (
-              <p className="product-description">{produto.descricao}</p>
+              <div className="produto-description-container">
+                <span className="description-label">Descrição:</span>
+                <p className="produto-description">{produto.descricao}</p>
+              </div>
             )}
-
-            <div className="product-details">
-              <div className="product-category">
+            
+            <div className="produto-details">
+              <div className="produto-category">
                 <span className="category-label">Categoria:</span>
                 {produto.categoria ? (
                   <span className="category-value">{produto.categoria.nome}</span>
@@ -80,14 +86,14 @@ const ProdutoList: React.FC<ProdutoListProps> = ({
                 )}
               </div>
               
-              <div className="product-price">
+              <div className="produto-price">
                 <span className="price-label">Preço:</span>
                 <span className="price-value">{formatPrice(produto.preco)}</span>
               </div>
             </div>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 };

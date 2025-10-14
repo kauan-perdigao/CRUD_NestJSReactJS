@@ -11,7 +11,7 @@ import SearchBar from './components/SearchBar';
 import Pagination from './components/Pagination';
 import { produtoService } from './services/produtoService';
 import { categoriaService } from './services/categoriaService';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto, ProdutoFilters } from './types/produto';
+import type { Produto, Categoria, CreateProdutoDto, UpdateProdutoDto, ProdutoFilters, CategoriaFilters } from './types/produto';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'produtos' | 'categorias'>('produtos');
@@ -25,7 +25,6 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showCategoriaForm, setShowCategoriaForm] = useState(false);
-  const [categoriaListKey, setCategoriaListKey] = useState(0);
   
   // Estados para paginação e filtros
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,8 +35,21 @@ function App() {
     limit: 10,
   });
   
-  // Estado para busca de categorias
-  const [categoriaSearch, setCategoriaSearch] = useState('');
+  // Estados para categorias (seguindo padrão dos produtos)
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [isLoadingCategorias, setIsLoadingCategorias] = useState(false);
+  const [editingCategoria, setEditingCategoria] = useState<Categoria | undefined>();
+  const [categoriaToDelete, setCategoriaToDelete] = useState<number | null>(null);
+  const [isConfirmCategoriaDialogOpen, setIsConfirmCategoriaDialogOpen] = useState(false);
+  
+  // Estados para paginação e filtros de categorias
+  const [currentPageCategorias, setCurrentPageCategorias] = useState(1);
+  const [totalPagesCategorias, setTotalPagesCategorias] = useState(1);
+  const [totalItemsCategorias, setTotalItemsCategorias] = useState(0);
+  const [categoriaFilters, setCategoriaFilters] = useState<CategoriaFilters>({
+    page: 1,
+    limit: 10,
+  });
 
   const loadProdutos = useCallback(async () => {
     try {
@@ -56,9 +68,30 @@ function App() {
     }
   }, [filters]);
 
+  const loadCategorias = useCallback(async () => {
+    try {
+      setIsLoadingCategorias(true);
+      setError(null);
+      const response = await categoriaService.getAllCategorias(categoriaFilters);
+      setCategorias(response.data);
+      setTotalPagesCategorias(response.totalPages);
+      setTotalItemsCategorias(response.total);
+      setCurrentPageCategorias(response.page);
+    } catch (err) {
+      console.error('Erro ao carregar categorias:', err);
+      setError('Erro ao carregar categorias. Verifique se o backend está rodando.');
+    } finally {
+      setIsLoadingCategorias(false);
+    }
+  }, [categoriaFilters]);
+
   useEffect(() => {
     loadProdutos();
   }, [loadProdutos]);
+
+  useEffect(() => {
+    loadCategorias();
+  }, [loadCategorias]);
 
   useEffect(() => {
     if (toast) {
@@ -144,6 +177,44 @@ function App() {
     setProdutoToDelete(null);
   };
 
+  // Handlers para categorias
+  const handleEditCategoria = (categoria: Categoria) => {
+    setEditingCategoria(categoria);
+    setShowCategoriaForm(true);
+  };
+
+  const handleDeleteCategoria = (id: number) => {
+    setCategoriaToDelete(id);
+    setIsConfirmCategoriaDialogOpen(true);
+  };
+
+  const confirmDeleteCategoria = async () => {
+    if (!categoriaToDelete) return;
+
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      await categoriaService.deleteCategoria(categoriaToDelete);
+      setCategorias(prev => prev.filter(c => c.id !== categoriaToDelete));
+      setIsConfirmCategoriaDialogOpen(false);
+      setCategoriaToDelete(null);
+      setToast({ type: 'success', message: 'Categoria excluída com sucesso!' });
+      
+      // Recarregar produtos para atualizar filtros
+      loadProdutos();
+    } catch (err) {
+      console.error('Erro ao deletar categoria:', err);
+      setError('Erro ao deletar categoria. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelCategoriaDelete = () => {
+    setIsConfirmCategoriaDialogOpen(false);
+    setCategoriaToDelete(null);
+  };
+
   // Handlers para filtros e paginação
   const handleSearch = useCallback((search: string) => {
     setFilters(prev => ({
@@ -163,23 +234,47 @@ function App() {
   }, []);
 
   const handleCategoriaSearch = useCallback((search: string) => {
-    setCategoriaSearch(search);
+    setCategoriaFilters(prev => ({
+      ...prev,
+      search: search || undefined,
+      page: 1,
+    }));
+  }, []);
+
+  const handleCategoriaPageChange = useCallback((page: number) => {
+    setCategoriaFilters(prev => ({
+      ...prev,
+      page,
+    }));
   }, []);
 
   const handleSaveCategoria = async (categoriaData: { nome?: string; descricao?: string }) => {
     try {
-      await categoriaService.createCategoria(categoriaData as { nome: string; descricao?: string });
+      setIsSubmitting(true);
+      setError(null);
+
+      if (editingCategoria) {
+        const updatedCategoria = await categoriaService.updateCategoria(editingCategoria.id, categoriaData);
+        setCategorias(prev => 
+          prev.map(c => c.id === editingCategoria.id ? updatedCategoria : c)
+        );
+        setToast({ type: 'success', message: 'Categoria atualizada com sucesso!' });
+      } else {
+        const newCategoria = await categoriaService.createCategoria(categoriaData as { nome: string; descricao?: string });
+        setCategorias(prev => [...prev, newCategoria]);
+        setToast({ type: 'success', message: 'Categoria criada com sucesso!' });
+      }
+
       setShowCategoriaForm(false);
-      setToast({ type: 'success', message: 'Categoria criada com sucesso!' });
-      
-      // Forçar atualização do CategoriaList
-      setCategoriaListKey(prev => prev + 1);
+      setEditingCategoria(undefined);
       
       // Recarregar produtos para atualizar filtros de categoria
       loadProdutos();
     } catch (error) {
-      console.error('Erro ao criar categoria:', error);
-      setToast({ type: 'error', message: 'Erro ao criar categoria' });
+      console.error('Erro ao salvar categoria:', error);
+      setError('Erro ao salvar categoria. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -288,11 +383,22 @@ function App() {
             />
           </>
         ) : (
-          <CategoriaList 
-            key={categoriaListKey}
-            searchTerm={categoriaSearch}
-            onCategoriaChange={loadProdutos}
-          />
+          <>
+            <CategoriaList
+              categorias={categorias}
+              onEdit={handleEditCategoria}
+              onDelete={handleDeleteCategoria}
+              isLoading={isLoadingCategorias}
+            />
+            
+            <Pagination
+              currentPage={currentPageCategorias}
+              totalPages={totalPagesCategorias}
+              total={totalItemsCategorias}
+              limit={categoriaFilters.limit || 10}
+              onPageChange={handleCategoriaPageChange}
+            />
+          </>
         )}
       </main>
 
@@ -314,10 +420,23 @@ function App() {
         isLoading={isSubmitting}
       />
 
+      <ConfirmDialog
+        isOpen={isConfirmCategoriaDialogOpen}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita."
+        onConfirm={confirmDeleteCategoria}
+        onCancel={handleCancelCategoriaDelete}
+        isLoading={isSubmitting}
+      />
+
       {showCategoriaForm && (
         <CategoriaForm
+          categoria={editingCategoria}
           onSave={handleSaveCategoria}
-          onCancel={() => setShowCategoriaForm(false)}
+          onCancel={() => {
+            setShowCategoriaForm(false);
+            setEditingCategoria(undefined);
+          }}
           isLoading={isSubmitting}
         />
       )}

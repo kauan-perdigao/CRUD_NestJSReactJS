@@ -42,7 +42,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
 
   const loadCategorias = async () => {
     try {
-      const data = await categoriaService.getAllCategorias();
+      const data = await categoriaService.getAllCategoriasSimple();
       setCategorias(data);
     } catch (error) {
       console.error('Erro ao carregar categorias:', error);

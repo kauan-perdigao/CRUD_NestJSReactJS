@@ -22,7 +22,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   const loadCategorias = async () => {
     try {
       setIsLoading(true);
-      const data = await categoriaService.getAllCategorias();
+      const data = await categoriaService.getAllCategoriasSimple();
       setCategorias(data);
     } catch (error) {
       console.error('Erro ao carregar categorias:', error);

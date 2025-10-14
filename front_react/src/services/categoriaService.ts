@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Categoria } from '../types/produto';
+import type { Categoria, PaginatedResponse, CategoriaFilters } from '../types/produto';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -11,10 +11,22 @@ const api = axios.create({
 });
 
 export const categoriaService = {
-  // Listar todas as categorias
-  async getAllCategorias(search?: string): Promise<Categoria[]> {
-    const params = search ? { search } : {};
+  // Listar todas as categorias com paginação
+  async getAllCategorias(filters: CategoriaFilters = {}): Promise<PaginatedResponse<Categoria>> {
+    const params: Record<string, string> = {};
+    
+    if (filters.search) params.search = filters.search;
+    if (filters.page) params.page = filters.page.toString();
+    if (filters.limit) params.limit = filters.limit.toString();
+    
     const response = await api.get('/categorias', { params });
+    return response.data;
+  },
+
+  // Listar todas as categorias (formato simples para dropdowns)
+  async getAllCategoriasSimple(search?: string): Promise<Categoria[]> {
+    const params = search ? { search } : {};
+    const response = await api.get('/categorias/simple/all', { params });
     return response.data;
   },
 

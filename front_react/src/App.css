@@ -981,18 +981,217 @@ body {
   margin: 0;
 }
 
-/* Responsividade para categorias */
+/* Estilos para Categorias */
+.categoria-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.categoria-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.categoria-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.categoria-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.categoria-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.categoria-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.categoria-card:hover .categoria-actions {
+  opacity: 1;
+}
+
+.categoria-content {
+  flex: 1;
+}
+
+.categoria-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.categoria-description-container {
+  margin-top: 0.75rem;
+}
+
+.categoria-description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+/* Estilos para Produtos - Idênticos aos das Categorias */
+.produto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.produto-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.produto-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.produto-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.produto-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.produto-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.produto-card:hover .produto-actions {
+  opacity: 1;
+}
+
+.produto-content {
+  flex: 1;
+}
+
+.produto-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.produto-description-container {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.produto-description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.produto-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+}
+
+.produto-category,
+.produto-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-label,
+.price-label,
+.description-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.category-value {
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.category-value-null {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.price-value {
+  font-size: 1rem;
+  color: var(--success-color);
+  font-weight: 700;
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
-  .categorias-grid {
+  .categoria-grid,
+  .produto-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .categoria-card {
+  .categoria-card,
+  .produto-card {
     padding: 1rem;
   }
   
-  .categoria-actions {
+  .categoria-actions,
+  .produto-actions {
     opacity: 1;
   }
   

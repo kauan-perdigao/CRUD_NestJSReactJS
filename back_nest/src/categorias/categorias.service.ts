@@ -4,6 +4,7 @@ import { Repository, Like } from 'typeorm';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { Categoria } from './entities/categoria.entity';
+import { PaginatedResponse, CategoriaFilters } from '../interfaces/pagination.interface';
 
 @Injectable()
 export class CategoriasService {
@@ -17,16 +18,41 @@ export class CategoriasService {
     return this.repo.save(categoria);
   }
 
-  findAll(search?: string) {
+  async findAll(filters: CategoriaFilters = {}): Promise<PaginatedResponse<Categoria>> {
+    const { search, page = 1, limit = 10 } = filters;
+    
+    const shouldPaginate = page !== undefined || limit !== undefined;
+    
+    const query = this.repo.createQueryBuilder('categoria');
+    
     if (search) {
-      return this.repo.find({
-        where: [
-          { nome: Like(`%${search}%`) },
-          { descricao: Like(`%${search}%`) }
-        ]
-      });
+      query.where(
+        'categoria.nome ILIKE :search OR categoria.descricao ILIKE :search',
+        { search: `%${search}%` }
+      );
     }
-    return this.repo.find();
+    
+    const totalItems = await query.getCount();
+    
+    if (shouldPaginate) {
+      const skip = (page - 1) * limit;
+      query.skip(skip).take(limit);
+    }
+    
+    const data = await query.getMany();
+    
+    return {
+      data,
+      total: totalItems,
+      page: shouldPaginate ? page : 1,
+      limit: shouldPaginate ? limit : totalItems,
+      totalPages: shouldPaginate ? Math.ceil(totalItems / limit) : 1
+    };
+  }
+
+  async findAllSimple(search?: string): Promise<Categoria[]> {
+    const result = await this.findAll({ search });
+    return result.data;
   }
 
   async findOne(id: number) {

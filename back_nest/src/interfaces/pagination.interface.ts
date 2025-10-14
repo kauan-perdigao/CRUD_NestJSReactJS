@@ -12,3 +12,9 @@ export interface ProdutoFilters {
   page?: number;
   limit?: number;
 }
+
+export interface CategoriaFilters {
+  search?: string;
+  page?: number;
+  limit?: number;
+}

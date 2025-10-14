@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { Produto } from './entities/produto.entity';
-import { PaginatedResponse, ProdutoFilters } from './interfaces/pagination.interface';
+import { PaginatedResponse, ProdutoFilters } from '../interfaces/pagination.interface';
 
 @Injectable()
 export class ProdutosService {
@@ -24,21 +24,17 @@ export class ProdutosService {
     const queryBuilder = this.repo.createQueryBuilder('produto')
       .leftJoinAndSelect('produto.categoria', 'categoria');
 
-    // Filtro de busca por nome
     if (search) {
       queryBuilder.where('produto.nome ILIKE :search', { search: `%${search}%` });
     }
 
-    // Filtro por categoria
     if (categoriaId) {
       queryBuilder.andWhere('produto.categoriaId = :categoriaId', { categoriaId });
     }
 
-    // Paginação
     const skip = (page - 1) * limit;
     queryBuilder.skip(skip).take(limit);
 
-    // Ordenação
     queryBuilder.orderBy('produto.id', 'DESC');
 
     const [data, total] = await queryBuilder.getManyAndCount();
