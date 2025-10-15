@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto, Categoria } from '../types';
-import { categoriaService } from '../services/categoriaService';
+import type { Produto, CreateProdutoDto, UpdateProdutoDto, Categoria } from '../../types';
+import { categoriaService } from '../../services';
 
 interface ProdutoFormProps {
   produto?: Produto;

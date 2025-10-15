@@ -681,7 +681,16 @@ body {
   pointer-events: none;
 }
 
-/* Paginação */
+/* Paginação Inteligente */
+.smart-pagination {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  align-items: center;
+}
+
+/* Paginação (compatibilidade com estilos antigos) */
 .pagination {
   display: flex;
   flex-direction: column;

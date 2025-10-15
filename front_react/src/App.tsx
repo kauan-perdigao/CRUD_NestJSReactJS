@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Package, Tag } from 'lucide-react';
-import './App.css';
-import ProdutoList from './components/ProdutoList';
-import ProdutoForm from './components/ProdutoForm';
-import CategoriaList from './components/CategoriaList';
-import CategoriaForm from './components/CategoriaForm';
-import ConfirmDialog from './components/ConfirmDialog';
-import Toast from './components/Toast';
-import SearchBar from './components/SearchBar';
-import Pagination from './components/Pagination';
-import { produtoService } from './services/produtoService';
-import { categoriaService } from './services/categoriaService';
+import './styles/App.css';
+import {
+  ProdutoList,
+  CategoriaList,
+  ProdutoForm,
+  CategoriaForm,
+  ConfirmDialog,
+  Toast,
+  SearchBar,
+  SmartPagination
+} from './components';
+import { produtoService, categoriaService } from './services';
 import type { Produto, Categoria, CreateProdutoDto, UpdateProdutoDto, ProdutoFilters, CategoriaFilters } from './types';
 
 function App() {
@@ -26,29 +27,29 @@ function App() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showCategoriaForm, setShowCategoriaForm] = useState(false);
   
-  // Estados para paginação e filtros
+  // Estados para paginação inteligente
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState<ProdutoFilters>({
     page: 1,
-    limit: 10,
+    limit: 12, // Limite menor para mostrar paginação quando necessário
   });
   
-  // Estados para categorias (seguindo padrão dos produtos)
+  // Estados para categorias
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [isLoadingCategorias, setIsLoadingCategorias] = useState(false);
   const [editingCategoria, setEditingCategoria] = useState<Categoria | undefined>();
   const [categoriaToDelete, setCategoriaToDelete] = useState<number | null>(null);
   const [isConfirmCategoriaDialogOpen, setIsConfirmCategoriaDialogOpen] = useState(false);
   
-  // Estados para paginação e filtros de categorias
+  // Estados para paginação de categorias
   const [currentPageCategorias, setCurrentPageCategorias] = useState(1);
   const [totalPagesCategorias, setTotalPagesCategorias] = useState(1);
   const [totalItemsCategorias, setTotalItemsCategorias] = useState(0);
   const [categoriaFilters, setCategoriaFilters] = useState<CategoriaFilters>({
     page: 1,
-    limit: 10,
+    limit: 12, // Limite menor para categorias também
   });
 
   const loadProdutos = useCallback(async () => {
@@ -216,16 +217,14 @@ function App() {
     setCategoriaToDelete(null);
   };
 
-  // Handlers para filtros e paginação
+  // Handlers para filtros e paginação inteligente
   const handleSearch = useCallback((search: string) => {
     setFilters(prev => ({
       ...prev,
       search: search || undefined,
-      page: 1,
+      page: 1, // Voltar para primeira página ao pesquisar
     }));
   }, []);
-
-
 
   const handlePageChange = useCallback((page: number) => {
     setFilters(prev => ({
@@ -238,7 +237,7 @@ function App() {
     setCategoriaFilters(prev => ({
       ...prev,
       search: search || undefined,
-      page: 1,
+      page: 1, // Voltar para primeira página ao pesquisar
     }));
   }, []);
 
@@ -375,11 +374,11 @@ function App() {
               isLoading={isLoading}
             />
             
-            <Pagination
+            <SmartPagination
               currentPage={currentPage}
               totalPages={totalPages}
               total={totalItems}
-              limit={filters.limit || 10}
+              limit={filters.limit || 12}
               onPageChange={handlePageChange}
             />
           </>
@@ -392,11 +391,11 @@ function App() {
               isLoading={isLoadingCategorias}
             />
             
-            <Pagination
+            <SmartPagination
               currentPage={currentPageCategorias}
               totalPages={totalPagesCategorias}
               total={totalItemsCategorias}
-              limit={categoriaFilters.limit || 10}
+              limit={categoriaFilters.limit || 12}
               onPageChange={handleCategoriaPageChange}
             />
           </>

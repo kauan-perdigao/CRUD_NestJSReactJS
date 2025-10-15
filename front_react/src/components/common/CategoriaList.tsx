@@ -1,6 +1,6 @@
 import React from 'react';
 import { Edit2, Trash2, Tag } from 'lucide-react';
-import type { Categoria } from '../types';
+import type { Categoria } from '../../types';
 
 interface CategoriaListProps {
   categorias: Categoria[];
