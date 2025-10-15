@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
-import { ProdutoFilters } from '../interfaces/pagination.interface';
+import { ProdutoFilters } from '../pagination/pagination.interface';
 
 @Controller('produtos')
 export class ProdutosController {

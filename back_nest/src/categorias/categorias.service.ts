@@ -4,7 +4,7 @@ import { Repository, Like } from 'typeorm';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { Categoria } from './entities/categoria.entity';
-import { PaginatedResponse, CategoriaFilters } from '../interfaces/pagination.interface';
+import { PaginatedResponse, CategoriaFilters } from '../pagination/pagination.interface';
 
 @Injectable()
 export class CategoriasService {

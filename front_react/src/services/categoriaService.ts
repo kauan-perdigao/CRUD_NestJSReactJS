@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Categoria, PaginatedResponse, CategoriaFilters } from '../types/produto';
+import type { Categoria, PaginatedResponse, CategoriaFilters } from '../types';
 
 const API_BASE_URL = 'http://localhost:3000';
 

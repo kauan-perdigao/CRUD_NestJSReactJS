@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto, PaginatedResponse, ProdutoFilters } from '../types/produto';
+import type { Produto, CreateProdutoDto, UpdateProdutoDto, PaginatedResponse, ProdutoFilters } from '../types';
 
 const API_BASE_URL = 'http://localhost:3000';
 

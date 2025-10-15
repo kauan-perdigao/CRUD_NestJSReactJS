@@ -11,7 +11,7 @@ import SearchBar from './components/SearchBar';
 import Pagination from './components/Pagination';
 import { produtoService } from './services/produtoService';
 import { categoriaService } from './services/categoriaService';
-import type { Produto, Categoria, CreateProdutoDto, UpdateProdutoDto, ProdutoFilters, CategoriaFilters } from './types/produto';
+import type { Produto, Categoria, CreateProdutoDto, UpdateProdutoDto, ProdutoFilters, CategoriaFilters } from './types';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'produtos' | 'categorias'>('produtos');
@@ -122,19 +122,18 @@ function App() {
       setError(null);
 
       if (editingProduto) {
-        const updatedProduto = await produtoService.updateProduto(editingProduto.id, produtoData);
-        setProdutos(prev => 
-          prev.map(p => p.id === editingProduto.id ? updatedProduto : p)
-        );
+        await produtoService.updateProduto(editingProduto.id, produtoData);
         setToast({ type: 'success', message: 'Produto atualizado com sucesso!' });
       } else {
-        const newProduto = await produtoService.createProduto(produtoData as CreateProdutoDto);
-        setProdutos(prev => [...prev, newProduto]);
+        await produtoService.createProduto(produtoData as CreateProdutoDto);
         setToast({ type: 'success', message: 'Produto criado com sucesso!' });
       }
 
       setIsFormOpen(false);
       setEditingProduto(undefined);
+      
+      // Recarregar a lista de produtos para obter os dados atualizados com relações
+      await loadProdutos();
     } catch (err) {
       console.error('Erro ao salvar produto:', err);
       setError('Erro ao salvar produto. Tente novamente.');
@@ -155,10 +154,12 @@ function App() {
       setIsSubmitting(true);
       setError(null);
       await produtoService.deleteProduto(produtoToDelete);
-      setProdutos(prev => prev.filter(p => p.id !== produtoToDelete));
       setIsConfirmDialogOpen(false);
       setProdutoToDelete(null);
       setToast({ type: 'success', message: 'Produto excluído com sucesso!' });
+      
+      // Recarregar a lista de produtos
+      await loadProdutos();
     } catch (err) {
       console.error('Erro ao deletar produto:', err);
       setError('Erro ao deletar produto. Tente novamente.');

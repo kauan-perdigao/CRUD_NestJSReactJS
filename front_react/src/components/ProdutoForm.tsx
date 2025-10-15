@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
-import type { Produto, CreateProdutoDto, UpdateProdutoDto, Categoria } from '../types/produto';
+import type { Produto, CreateProdutoDto, UpdateProdutoDto, Categoria } from '../types';
 import { categoriaService } from '../services/categoriaService';
 
 interface ProdutoFormProps {
@@ -53,7 +53,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
     e.preventDefault();
     setFormError(null);
     
-    if (!formData.categoriaId) {
+    if (!formData.categoriaId || formData.categoriaId === 0) {
       setFormError('Por favor, selecione uma categoria.');
       return;
     }
@@ -61,7 +61,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
     onSave({
       ...formData,
       preco: Number(formData.preco),
-      categoriaId: formData.categoriaId,
+      categoriaId: Number(formData.categoriaId),
     });
   };
 
@@ -69,7 +69,7 @@ const ProdutoForm: React.FC<ProdutoFormProps> = ({
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'categoriaId' ? (value ? Number(value) : 0) : value,
+      [name]: name === 'categoriaId' ? (value !== '' ? Number(value) : 0) : value,
     }));
   };
 

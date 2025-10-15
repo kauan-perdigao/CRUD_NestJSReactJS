@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
-import type { Categoria } from '../types/produto';
-
-interface CreateCategoriaDto {
-  nome: string;
-  descricao?: string;
-}
-
-interface UpdateCategoriaDto {
-  nome?: string;
-  descricao?: string;
-}
+import type { Categoria, CreateCategoriaDto, UpdateCategoriaDto } from '../types';
 
 interface CategoriaFormProps {
   categoria?: Categoria;

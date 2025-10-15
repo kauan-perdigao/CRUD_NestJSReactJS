@@ -13,6 +13,16 @@ export interface Produto {
   categoria?: Categoria;
 }
 
+export interface CreateCategoriaDto {
+  nome: string;
+  descricao?: string;
+}
+
+export interface UpdateCategoriaDto {
+  nome?: string;
+  descricao?: string;
+}
+
 export interface CreateProdutoDto {
   nome: string;
   descricao?: string;
@@ -27,12 +37,10 @@ export interface UpdateProdutoDto {
   categoriaId?: number;
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+export interface CategoriaFilters {
+  search?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface ProdutoFilters {
@@ -42,8 +50,10 @@ export interface ProdutoFilters {
   limit?: number;
 }
 
-export interface CategoriaFilters {
-  search?: string;
-  page?: number;
-  limit?: number;
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }

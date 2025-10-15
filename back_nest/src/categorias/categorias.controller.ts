@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { CategoriasService } from './categorias.service';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
-import { CategoriaFilters } from '../interfaces/pagination.interface';
+import { CategoriaFilters } from '../pagination/pagination.interface';
 
 @Controller('categorias')
 export class CategoriasController {

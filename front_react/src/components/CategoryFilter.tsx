@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Filter } from 'lucide-react';
-import type { Categoria } from '../types/produto';
+import type { Categoria } from '../types';
 import { categoriaService } from '../services/categoriaService';
 
 interface CategoryFilterProps {

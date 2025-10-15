@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { Produto } from './entities/produto.entity';
-import { PaginatedResponse, ProdutoFilters } from '../interfaces/pagination.interface';
+import { PaginatedResponse, ProdutoFilters } from '../pagination/pagination.interface';
 
 @Injectable()
 export class ProdutosService {
@@ -52,16 +52,29 @@ export class ProdutosService {
   async findOne(id: number) {
     const produto = await this.repo.findOne({
       where: { id },
-      relations: ['categoria'],
+      relations: ['categoria']
     });
-    if (!produto) throw new NotFoundException(`Produto ${id} not found`);
+
+    if (!produto) {
+      throw new NotFoundException(`Produto com ID ${id} não encontrado`);
+    }
+
     return produto;
   }
 
   async update(id: number, updateProdutoDto: UpdateProdutoDto) {
     const produto = await this.findOne(id);
+    
+    // Remover a relação categoria para evitar conflitos
+    if (updateProdutoDto.categoriaId !== undefined) {
+      produto.categoria = undefined;
+    }
+    
     Object.assign(produto, updateProdutoDto as any);
-    return this.repo.save(produto);
+    await this.repo.save(produto);
+    
+    // Recarregar o produto com as relações atualizadas
+    return this.findOne(id);
   }
 
   async remove(id: number) {
