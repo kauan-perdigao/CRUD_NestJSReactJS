@@ -421,22 +421,78 @@ git commit -m "docs: atualizar documentação"
 git commit -m "style: ajustar espaçamento dos cards"
 ```
 
-## 📝 Notas Importantes
+# CRUD_NestJSReactJS — Resumo rápido
 
-1. **Banco de Dados**: Certifique-se de que o PostgreSQL está rodando antes de iniciar o backend
-2. **Variáveis de Ambiente**: Configure corretamente o arquivo `.env` no backend
-3. **Portas**: Backend (3000) e Frontend (5174) - certifique-se de que estão livres
-4. **Node Version**: Use Node.js versão 18 ou superior para melhor compatibilidade
-5. **CORS**: O backend está configurado para aceitar requisições do frontend
+Projeto exemplo: API e painel para gerenciar produtos e categorias.
 
-## 🤝 Contribuindo
+Principais tecnologias
+- Backend: NestJS + TypeORM + PostgreSQL
+- Frontend: React + TypeScript + Vite
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'feat: Add AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+Pré-requisitos
+- Node.js >= 18
+- npm ou yarn
+- PostgreSQL rodando
+
+Instalação rápida
+
+1) Backend
+```bash
+cd back_nest
+npm install
+cp .env.example .env   # ajustar variáveis (DB_HOST, DB_USER, DB_PASS, DB_NAME, PORT)
+```
+
+2) Frontend
+```bash
+cd front_react
+npm install
+```
+
+Executando em desenvolvimento
+
+```bash
+# Em um terminal: backend
+cd back_nest
+npm run start:dev
+
+# Em outro: frontend
+cd front_react
+npm run dev
+```
+
+Padrões rápidos
+- Backend: http://localhost:3000 (Swagger em /api)
+- Frontend: http://localhost:5174
+- Paginação: limite recomendado 12 itens por página; controles aparecem quando necessário
+
+Estrutura mínima do repositório
+
+```
+back_nest/    # NestJS (src/*)
+front_react/  # React + Vite (src/*)
+README.md     # este arquivo
+```
+
+Endpoints principais
+- GET /produtos
+- GET /produtos/:id
+- POST /produtos
+- PUT /produtos/:id
+- DELETE /produtos/:id
+
++- GET /categorias
+- GET /categorias/:id
+- POST /categorias
+- PUT /categorias/:id
+- DELETE /categorias/:id
+
+Contribuição
+- Abra issues ou PRs. Siga as convenções de commits e crie branches por feature.
+
+Licença
+- Use conforme sua necessidade (adicione LICENSE se desejar).
 
 ---
 
-**Desenvolvido com ❤️ usando NestJS e React**
+Arquivo reduzido: instruções essenciais e links rápidos. Para documentação completa, veja os arquivos do projeto.
