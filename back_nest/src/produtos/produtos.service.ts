@@ -65,7 +65,6 @@ export class ProdutosService {
   async update(id: number, updateProdutoDto: UpdateProdutoDto) {
     const produto = await this.findOne(id);
     
-    // Remover a relação categoria para evitar conflitos
     if (updateProdutoDto.categoriaId !== undefined) {
       produto.categoria = undefined;
     }
@@ -73,7 +72,6 @@ export class ProdutosService {
     Object.assign(produto, updateProdutoDto as any);
     await this.repo.save(produto);
     
-    // Recarregar o produto com as relações atualizadas
     return this.findOne(id);
   }
 
