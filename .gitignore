@@ -1,8 +1,6 @@
 # Node.js
 node_modules/
 dist/
-src/app.service.ts
-src/app.controller.ts
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -22,7 +20,4 @@ build/
 coverage/
 # NestJS
 *.tsbuildinfo
-# Ignore app module (as requested)
-src/app.module.tsback_nest/.git.backup*/
-back_nest/src/app.module.ts
-back_nest/node_modules/@nestjs/schematics/dist/lib/application/files/ts/src/app.module.ts
+
